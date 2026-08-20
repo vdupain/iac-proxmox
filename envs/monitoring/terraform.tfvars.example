@@ -1,0 +1,23 @@
+# Terraform variables for the monitoring environment
+# Copy this file to terraform.tfvars and fill in your values.
+
+# Proxmox configuration
+# proxmox = {
+#   endpoint           = "https://pve1.example.com:8006/"
+#   api_token          = "root@pam!terraform=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+#   insecure           = true
+#   username           = "root@pam"
+#   password           = "your-password"
+#   random_vm_ids      = true
+#   random_vm_id_start = 2000
+#   random_vm_id_end   = 3000
+# }
+
+# SSH public key for cloud-init user
+# ssh_public_key = "ssh-ed25519 AAAAC3... your-key-comment"
+
+# Debian cloud image URL (default: latest Debian 13 Trixie)
+# debian_image_url = "https://cloud.debian.org/images/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2"
+
+# Cloud-init user (default: debian)
+# ci_user = "debian"
