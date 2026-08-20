@@ -1,15 +1,17 @@
 # Terraform variables for the monitoring environment
 # Copy this file to terraform.tfvars and fill in your values.
 
-# Proxmox endpoint (e.g. https://pve1.example.com:8006/)
-# proxmox_endpoint = "https://192.168.50.x:8006/"
-
-# Proxmox API token (format: USER@REALM!TOKEN_NAME=TOKEN_VALUE)
-# proxmox_api_token = "root@pam!terraform=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-
-# Proxmox username/password fallback (used if api_token is not set)
-# proxmox_username = "root@pam"
-# proxmox_password = "your-password"
+# Proxmox configuration
+# proxmox = {
+#   endpoint           = "https://pve1.example.com:8006/"
+#   api_token          = "root@pam!terraform=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+#   insecure           = true
+#   username           = "root@pam"
+#   password           = "your-password"
+#   random_vm_ids      = true
+#   random_vm_id_start = 2000
+#   random_vm_id_end   = 3000
+# }
 
 # SSH public key for cloud-init user
 # ssh_public_key = "ssh-ed25519 AAAAC3... your-key-comment"
