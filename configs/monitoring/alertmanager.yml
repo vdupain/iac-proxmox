@@ -1,0 +1,19 @@
+# alertmanager.yml — Exported from LXC 107 (pve2)
+#
+# Source: /etc/alertmanager/alertmanager.yml
+# Exported by: homelab (via pct exec 107 cat /etc/alertmanager/alertmanager.yml)
+# Export date: TBD
+#
+# TODO: Replace this placeholder with the actual file content once exported.
+# See kanban task t_c412bca9 for the homelab export task.
+#
+route:
+  receiver: 'default'
+  group_by: ['alertname']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+
+receivers:
+  - name: 'default'
+    # Placeholder — actual content from LXC 107 goes here.
