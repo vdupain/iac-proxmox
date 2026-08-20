@@ -76,8 +76,14 @@ resource "proxmox_virtual_environment_vm" "vm" {
 
     user_account {
       username = var.ci_user
-      keys     = [var.ssh_public_key]
+      keys = [
+        var.ssh_public_key,
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGC+C79emTtE46iSqxTzqjGNeH8Tu3A6+5jh0WiFL5RC vincent.dupain@protonmail.com",
+      ]
     }
+
+    package_update = true
+    packages       = ["qemu-guest-agent"]
 
     dynamic "dns" {
       for_each = (each.value.dns_domain != null || each.value.dns_servers != null) ? [1] : []
