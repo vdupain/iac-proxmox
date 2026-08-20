@@ -12,7 +12,7 @@ resource "proxmox_download_file" "debian_image" {
   content_type = "iso"
   datastore_id = "local"
 
-  file_name           = "debian-13-genericcloud-amd64.qcow2"
+  file_name           = "debian-13-genericcloud-amd64.iso"
   url                 = var.debian_image_url
   overwrite           = false
   overwrite_unmanaged = true

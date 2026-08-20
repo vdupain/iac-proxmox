@@ -23,7 +23,7 @@ module "monitoring_vms" {
       datastore_id     = "local-zfs"
       disk_file_format = "raw"
       dns_domain       = "homelab.vincentdupain.com"
-      dns_servers      = ["192.168.50.240"]
+      dns_servers      = ["192.168.50.1"]
     }
     prometheus = {
       host_node        = "pve2"
@@ -40,7 +40,7 @@ module "monitoring_vms" {
       datastore_id     = "local-zfs"
       disk_file_format = "raw"
       dns_domain       = "homelab.vincentdupain.com"
-      dns_servers      = ["192.168.50.240"]
+      dns_servers      = ["192.168.50.1"]
     }
   }
 }
