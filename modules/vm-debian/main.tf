@@ -18,6 +18,39 @@ resource "proxmox_download_file" "debian_image" {
   overwrite_unmanaged = true
 }
 
+resource "proxmox_virtual_environment_file" "cloud_config" {
+  for_each = var.vms
+
+  content_type = "snippets"
+  datastore_id = "local"
+  node_name    = each.value.host_node
+
+  source_raw {
+    data = <<-EOF
+    #cloud-config
+    hostname: ${each.value.hostname}
+    users:
+      - default
+      - name: ${var.ci_user}
+        groups:
+          - sudo
+        shell: /bin/bash
+        ssh_authorized_keys:
+          - ${var.ssh_public_key}
+          - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGC+C79emTtE46iSqxTzqjGNeH8Tu3A6+5jh0WiFL5RC vincent.dupain@protonmail.com
+        sudo: ALL=(ALL) NOPASSWD:ALL
+    package_update: true
+    packages:
+      - qemu-guest-agent
+    runcmd:
+      - systemctl enable qemu-guest-agent
+      - systemctl start qemu-guest-agent
+    EOF
+
+    file_name = "cloud-config-${each.key}.yaml"
+  }
+}
+
 resource "proxmox_virtual_environment_vm" "vm" {
   for_each = var.vms
 
@@ -74,16 +107,7 @@ resource "proxmox_virtual_environment_vm" "vm" {
   initialization {
     datastore_id = each.value.datastore_id
 
-    user_account {
-      username = var.ci_user
-      keys = [
-        var.ssh_public_key,
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGC+C79emTtE46iSqxTzqjGNeH8Tu3A6+5jh0WiFL5RC vincent.dupain@protonmail.com",
-      ]
-    }
-
-    package_update = true
-    packages       = ["qemu-guest-agent"]
+    user_data_file_id = proxmox_virtual_environment_file.cloud_config[each.key].id
 
     dynamic "dns" {
       for_each = (each.value.dns_domain != null || each.value.dns_servers != null) ? [1] : []
