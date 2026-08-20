@@ -1,0 +1,34 @@
+#cloud-config
+hostname: ${hostname}
+fqdn: ${fqdn}
+
+users:
+  - name: ${user}
+    ssh_authorized_keys:
+      - ${ssh_key}
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: users, admin
+    shell: /bin/bash
+  - name: root
+    ssh_authorized_keys:
+      - ${ssh_key}
+
+package_update: true
+package_upgrade: true
+
+packages:
+  - qemu-guest-agent
+  - curl
+  - wget
+  - vim
+  - htop
+  - net-tools
+  - dnsutils
+  - apt-transport-https
+  - ca-certificates
+  - gnupg
+  - lsb-release
+
+runcmd:
+  - systemctl enable --now qemu-guest-agent
+  - echo "Cloud-init completed" > /var/log/cloud-init-completed

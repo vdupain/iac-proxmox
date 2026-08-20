@@ -1,0 +1,30 @@
+---
+# === Global variables for monitoring VM configuration ===
+
+# Node exporter
+node_exporter_version: "1.8.2"
+node_exporter_port: 9100
+node_exporter_install_dir: "/opt/node_exporter"
+node_exporter_download_url: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz"
+
+# Prometheus server (only active on the prometheus node)
+prometheus_version: "2.55.1"
+prometheus_port: 9090
+prometheus_install_dir: "/opt/prometheus"
+prometheus_data_dir: "/var/lib/prometheus"
+prometheus_download_url: "https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
+prometheus_retention_days: 30
+
+# Scrape targets (node_exporter on both VMs)
+prometheus_scrape_targets:
+  - job_name: "node"
+    scrape_interval: "15s"
+    static_configs:
+      - targets:
+          - "192.168.50.248:{{ node_exporter_port }}"
+          - "192.168.50.249:{{ node_exporter_port }}"
+        labels:
+          group: "monitoring-vms"
+
+# DNS domain
+dns_domain: "homelab.vincentdupain.com"

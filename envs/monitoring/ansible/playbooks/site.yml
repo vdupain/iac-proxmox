@@ -1,0 +1,207 @@
+---
+# ==============================================================
+# Monitoring stack playbook — node_exporter + Prometheus
+# ==============================================================
+# Applies to both VMs: installs node_exporter on all nodes.
+# On the Prometheus node (192.168.50.249), also installs and
+# configures the Prometheus server to scrape all node_exporter
+# targets.
+#
+# Usage:
+#   ansible-playbook -i inventory.yml playbooks/site.yml
+#
+# Requires:
+#   - SSH access to the VMs (key-based auth, monitoring user)
+#   - Ansible >= 2.16
+# ==============================================================
+
+- name: Bootstrap — install Python on bare Debian cloud images
+  hosts: monitoring
+  gather_facts: false
+  become: true
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  pre_tasks:
+    - name: Ensure Python 3 is available (raw bootstrap)
+      ansible.builtin.raw: >
+        test -e /usr/bin/python3 ||
+        (apt-get update -qq && apt-get install -y -qq python3)
+      changed_when: false
+    - name: Gather facts
+      ansible.builtin.setup:
+
+- name: Install node_exporter on all monitoring VMs
+  hosts: monitoring
+  become: true
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  tasks:
+    - name: Create node_exporter system user
+      ansible.builtin.user:
+        name: node_exporter
+        system: true
+        shell: /usr/sbin/nologin
+        home: /nonexistent
+        create_home: false
+
+    - name: Download node_exporter archive
+      ansible.builtin.get_url:
+        url: "{{ node_exporter_download_url }}"
+        dest: "/tmp/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz"
+        mode: 0644
+        timeout: 60
+      register: _dl
+
+    - name: Extract node_exporter binary
+      ansible.builtin.unarchive:
+        src: "/tmp/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz"
+        dest: /tmp
+        remote_src: true
+        creates: "/tmp/node_exporter-{{ node_exporter_version }}.linux-amd64/node_exporter"
+
+    - name: Install node_exporter binary
+      ansible.builtin.copy:
+        src: "/tmp/node_exporter-{{ node_exporter_version }}.linux-amd64/node_exporter"
+        dest: "{{ node_exporter_install_dir }}/node_exporter"
+        mode: 0755
+        owner: node_exporter
+        group: node_exporter
+        remote_src: true
+
+    - name: Deploy node_exporter systemd service
+      ansible.builtin.template:
+        src: ../templates/node_exporter.service.j2
+        dest: /etc/systemd/system/node_exporter.service
+        mode: 0644
+      notify: restart node_exporter
+
+    - name: Enable and start node_exporter
+      ansible.builtin.systemd:
+        name: node_exporter
+        enabled: true
+        state: started
+        daemon_reload: true
+
+    - name: Verify node_exporter is serving metrics
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ node_exporter_port }}/metrics"
+        method: GET
+      register: _metrics
+      changed_when: false
+      failed_when: _metrics.status != 200
+
+  handlers:
+    - name: restart node_exporter
+      ansible.builtin.systemd:
+        name: node_exporter
+        state: restarted
+        daemon_reload: true
+
+- name: Install and configure Prometheus server
+  hosts: prometheus
+  become: true
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  tasks:
+    - name: Create prometheus system user
+      ansible.builtin.user:
+        name: prometheus
+        system: true
+        shell: /usr/sbin/nologin
+        home: /nonexistent
+        create_home: false
+
+    - name: Create prometheus data directory
+      ansible.builtin.file:
+        path: "{{ prometheus_data_dir }}"
+        state: directory
+        owner: prometheus
+        group: prometheus
+        mode: 0755
+
+    - name: Download prometheus archive
+      ansible.builtin.get_url:
+        url: "{{ prometheus_download_url }}"
+        dest: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
+        mode: 0644
+        timeout: 120
+      register: _dl_prom
+
+    - name: Extract prometheus archive
+      ansible.builtin.unarchive:
+        src: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
+        dest: /tmp
+        remote_src: true
+        creates: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64/prometheus"
+
+    - name: Install prometheus binaries
+      ansible.builtin.copy:
+        src: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64/{{ item }}"
+        dest: "{{ prometheus_install_dir }}/{{ item }}"
+        mode: 0755
+        owner: prometheus
+        group: prometheus
+        remote_src: true
+      loop:
+        - prometheus
+        - promtool
+
+    - name: Copy consoles and console_libraries
+      ansible.builtin.copy:
+        src: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64/{{ item }}"
+        dest: "{{ prometheus_install_dir }}/{{ item }}"
+        mode: 0644
+        owner: prometheus
+        group: prometheus
+        remote_src: true
+      loop:
+        - consoles
+        - console_libraries
+
+    - name: Deploy prometheus.yml configuration
+      ansible.builtin.template:
+        src: ../templates/prometheus.yml.j2
+        dest: "{{ prometheus_install_dir }}/prometheus.yml"
+        mode: 0644
+        owner: prometheus
+        group: prometheus
+      notify: restart prometheus
+
+    - name: Deploy prometheus systemd service
+      ansible.builtin.template:
+        src: ../templates/prometheus.service.j2
+        dest: /etc/systemd/system/prometheus.service
+        mode: 0644
+      notify: restart prometheus
+
+    - name: Enable and start prometheus
+      ansible.builtin.systemd:
+        name: prometheus
+        enabled: true
+        state: started
+        daemon_reload: true
+
+    - name: Verify prometheus is serving
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ prometheus_port }}/api/v1/status/runtimeinfo"
+        method: GET
+      register: _prom_status
+      changed_when: false
+      failed_when: _prom_status.status != 200
+
+    - name: Verify node_exporter targets are up in prometheus
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ prometheus_port }}/api/v1/targets"
+        method: GET
+      register: _targets
+      changed_when: false
+      failed_when: >
+        _targets.json.data.activeTargets |
+        selectattr('health', 'equalto', 'up') | length < 1
+
+  handlers:
+    - name: restart prometheus
+      ansible.builtin.systemd:
+        name: prometheus
+        state: restarted
+        daemon_reload: true

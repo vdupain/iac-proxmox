@@ -1,0 +1,8 @@
+proxmox = {
+  endpoint  = "https://192.168.10.10:8006"
+  insecure  = true
+  username  = "root@pam"
+  api_token = ""
+}
+
+ssh_public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA..."

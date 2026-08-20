@@ -1,0 +1,32 @@
+# Prometheus configuration
+# Managed by Ansible — do not edit manually
+
+global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'homelab-monitoring'
+
+# Alertmanager (not yet deployed)
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+# Load scrape targets from file
+scrape_configs:
+{% for target in prometheus_scrape_targets %}
+  - job_name: '{{ target.job_name }}'
+    scrape_interval: {{ target.scrape_interval | default('15s') }}
+    static_configs:
+      - targets:
+{% for t in target.static_configs[0].targets %}
+          - '{{ t }}'
+{% endfor %}
+{% if target.static_configs[0].labels is defined %}
+        labels:
+{% for k, v in target.static_configs[0].labels.items() %}
+          {{ k }}: '{{ v }}'
+{% endfor %}
+{% endif %}
+{% endfor %}

@@ -1,0 +1,17 @@
+---
+# Inventory for the monitoring VMs on VLAN 50 (192.168.50.0/24)
+# These VMs are provisioned by Terraform in envs/monitoring/
+all:
+  children:
+    monitoring:
+      hosts:
+        grafana:
+          ansible_host: 192.168.50.248
+          ansible_user: monitoring
+          hostname: monitoring-grafana
+          prometheus_node: false
+        prometheus:
+          ansible_host: 192.168.50.249
+          ansible_user: monitoring
+          hostname: monitoring-prometheus
+          prometheus_node: true
