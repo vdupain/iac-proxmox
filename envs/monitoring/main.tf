@@ -19,7 +19,7 @@ module "monitoring_vms" {
       bridge           = "vmbr0"
       cpu              = 2
       memory_dedicated = 2048
-      disk_size        = 20
+      disk_size        = 10
       datastore_id     = "local-zfs"
       disk_file_format = "raw"
       dns_domain       = "homelab.vincentdupain.com"
@@ -36,7 +36,7 @@ module "monitoring_vms" {
       bridge           = "vmbr0"
       cpu              = 2
       memory_dedicated = 2048
-      disk_size        = 20
+      disk_size        = 10
       datastore_id     = "local-zfs"
       disk_file_format = "raw"
       dns_domain       = "homelab.vincentdupain.com"
