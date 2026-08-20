@@ -1,15 +1,42 @@
 # prometheus.yml — Exported from LXC 105 (pve0)
 #
-# Source: /etc/prometheus/prometheus.yml
-# Exported by: homelab (via pct exec 105 cat /etc/prometheus/prometheus.yml)
-# Export date: TBD
+# Source: /etc/prometheus/prometheus.yml (Prometheus v3.13.1)
+# Host: LXC 105, node pve0, Debian amd64, 1 core / 2GB RAM
+# Exported via: Prometheus API /api/v1/status/config
+# Export date: 2026-08-20
 #
-# TODO: Replace this placeholder with the actual file content once exported.
-# See kanban task t_c412bca9 for the homelab export task.
+# Notes:
+#   - Scrape configs are in separate files: /etc/prometheus/scrape_configs/*.yml
+#   - Rule files in: /etc/prometheus/rules/*.yml
+#   - Storage retention: 15d
+#   - web.enable-admin-api: true, web.enable-lifecycle: true
+#   - Agent mode: false (full TSDB)
 #
+
 global:
   scrape_interval: 15s
-  evaluation_interval: 15s
+  scrape_timeout: 10s
+  evaluation_interval: 1m
 
-# Placeholder — actual content from LXC 105 goes here.
-scrape_configs: []
+alerting:
+  alertmanagers:
+    - follow_redirects: true
+      enable_http2: true
+      scheme: http
+      timeout: 10s
+      api_version: v2
+      static_configs:
+        - targets:
+            - prometheus-alertmanager:9093
+
+rule_files:
+  - /etc/prometheus/rules/*.yml
+
+scrape_config_files:
+  - /etc/prometheus/scrape_configs/*.yml
+
+storage:
+  tsdb:
+    outofordertimewindow: 0s
+    retention:
+      time: 15d

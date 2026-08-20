@@ -1,19 +1,30 @@
-# alertmanager.yml — Exported from LXC 107 (pve2)
+# alertmanager.yml — Template from LXC 113 (pve0)
 #
 # Source: /etc/alertmanager/alertmanager.yml
-# Exported by: homelab (via pct exec 107 cat /etc/alertmanager/alertmanager.yml)
-# Export date: TBD
+# Host: LXC 113, node pve0, Debian amd64, 1 core / 1GB RAM
+# Export date: 2026-08-20
 #
-# TODO: Replace this placeholder with the actual file content once exported.
-# See kanban task t_c412bca9 for the homelab export task.
+# WARNING: The actual config file could NOT be read remotely.
+#   - Alertmanager port 9093 is not accessible from the management network
+#   - Prometheus successfully connects to prometheus-alertmanager:9093
+#     (verified via /api/v1/alertmanagers: 1 active)
+#   - The container runs with very low memory (~20MB used), suggesting
+#     minimal configuration
+#   - This file is a best-guess template. Replace with actual content:
+#     pve0# pct exec 113 cat /etc/alertmanager/alertmanager.yml
 #
 route:
-  receiver: 'default'
-  group_by: ['alertname']
+  receiver: "default"
+  group_by: ["alertname"]
   group_wait: 30s
   group_interval: 5m
   repeat_interval: 4h
+  routes: []
 
 receivers:
-  - name: 'default'
-    # Placeholder — actual content from LXC 107 goes here.
+  - name: "default"
+    webhook_configs:
+      - send_resolved: false
+        url: "http://localhost:9093/webhook"
+
+inhibit_rules: []

@@ -7,11 +7,11 @@ Reference monitoring configurations exported from existing LXCs.
 These configs are exported from the existing Proxmox LXCs that run the
 current monitoring stack, before migrating to dedicated VMs.
 
-| LXC | Host | Role | IP |
-|-----|------|------|----|
-| 105 | pve0 | - | - |
-| 107 | pve2 | - | - |
-| 113 | pve2 | - | - |
+|| LXC | Host | Role | IP (mgmt) | Software | Version |
+||-----|------|------|-----------|----------|---------|
+|| 105 | pve0 | Prometheus | 192.168.10.189 | Prometheus | v3.13.1 |
+|| 107 | pve2 | Grafana | 192.168.10.192 | Grafana | v13.1.1 |
+|| 113 | pve0 | Alertmanager | 192.168.10.188 | Alertmanager | (not accessible) |
 
 ## Exported files
 
