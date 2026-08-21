@@ -38,6 +38,7 @@ resource "proxmox_virtual_environment_file" "cloud_config" {
         ssh_authorized_keys:
           - ${var.ssh_public_key}
           - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGC+C79emTtE46iSqxTzqjGNeH8Tu3A6+5jh0WiFL5RC vincent.dupain@protonmail.com
+          - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGyRLx6YuiLftvtcLQY6ZMq5OHUn1PAlQVY+z+8FXwXV vincent.dupain@protonmail.com
         sudo: ALL=(ALL) NOPASSWD:ALL
     package_update: true
     packages:
