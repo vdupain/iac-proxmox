@@ -26,7 +26,7 @@ module "monitoring_vms" {
       dns_servers      = ["192.168.50.1"]
     }
     prometheus = {
-      host_node        = "pve2"
+      host_node        = "pve0"
       hostname         = "monitoring-prometheus"
       ip               = "192.168.50.249"
       cidr             = 24
