@@ -9,7 +9,7 @@ module "monitoring_vms" {
 
   vms = {
     grafana = {
-      host_node        = "pve2"
+      host_node        = "pve0"
       hostname         = "monitoring-grafana"
       ip               = "192.168.50.248"
       cidr             = 24
