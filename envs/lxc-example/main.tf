@@ -1,5 +1,5 @@
 module "lxc_test" {
-  source = "../../modules/lxc-debian"
+  source = "../../modules/lxc-alpine"
 
   proxmox = var.proxmox
 
@@ -20,7 +20,7 @@ module "lxc_test" {
       memory_swap      = 512
       disk_size        = 4
       datastore_id     = "local-zfs"
-      template_file_id = "local:vztmpl/debian-13-standard_13.6-1_amd64.tar.zst"
+      template_file_id = "local:vztmpl/alpine-3.24-default_20260714_amd64.tar.xz"
       description      = "Example LXC test container"
       dns_domain       = "homelab.vincentdupain.com"
       dns_servers      = ["192.168.50.1"]

@@ -35,7 +35,7 @@ resource "proxmox_virtual_environment_container" "lxc" {
 
   operating_system {
     template_file_id = each.value.template_file_id
-    type             = "debian"
+    type             = "alpine"
   }
 
   initialization {
