@@ -1,5 +1,5 @@
 module "lxc_test" {
-  source = "../../modules/lxc-alpine"
+  source = "../../modules/lxc-container"
 
   proxmox = var.proxmox
 
