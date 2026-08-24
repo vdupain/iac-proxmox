@@ -32,11 +32,12 @@ variable "containers" {
     dns_domain       = optional(string, null)
     dns_servers      = optional(list(string), null)
     unprivileged     = optional(bool, true)
+    tags             = optional(list(string), [])
   }))
 }
 
-variable "ssh_public_key" {
-  description = "SSH public key for the LXC container user"
-  type        = string
+variable "ssh_keys" {
+  description = "SSH public keys for the LXC container user"
+  type        = list(string)
   sensitive   = true
 }

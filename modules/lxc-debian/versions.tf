@@ -5,9 +5,5 @@ terraform {
       source  = "bpg/proxmox"
       version = "~> 0.111"
     }
-    time = {
-      source  = "hashicorp/time"
-      version = "~> 0.13"
-    }
   }
 }

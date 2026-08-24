@@ -13,5 +13,8 @@
 #   random_vm_id_end   = 3000
 # }
 
-# SSH public key for container user
-# ssh_public_key = "ssh-ed25519 AAAAC3... your-key-comment"
+# SSH public keys for container user
+# ssh_keys = [
+#   "ssh-ed25519 AAAAC3... your-key-comment",
+#   "ssh-ed25519 AAAAC3... another-key-comment",
+# ]

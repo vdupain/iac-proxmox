@@ -14,8 +14,8 @@ variable "proxmox" {
   sensitive = true
 }
 
-variable "ssh_public_key" {
-  description = "SSH public key for container user"
-  type        = string
+variable "ssh_keys" {
+  description = "SSH public keys for the container user"
+  type        = list(string)
   sensitive   = true
 }

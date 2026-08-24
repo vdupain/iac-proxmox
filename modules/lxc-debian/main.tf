@@ -2,6 +2,7 @@ resource "proxmox_virtual_environment_container" "lxc" {
   for_each = var.containers
 
   node_name     = each.value.host_node
+  description   = each.value.description
   start_on_boot = true
   started       = true
   unprivileged  = each.value.unprivileged
@@ -58,22 +59,13 @@ resource "proxmox_virtual_environment_container" "lxc" {
     }
 
     user_account {
-      keys = [
-        var.ssh_public_key,
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGC+C79emTtE46iSqxTzqjGNeH8Tu3A6+5jh0WiFL5RC vincent.dupain@protonmail.com",
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGyRLx6YuiLftvtcLQY6ZMq5OHUn1PAlQVY+z+8FXwXV vincent.dupain@protonmail.com",
-      ]
+      keys = var.ssh_keys
     }
   }
 
   lifecycle {
     ignore_changes = [
-      initialization[0].dns[0],
+      initialization[0].dns,
     ]
   }
-}
-
-resource "time_sleep" "wait_for_ip" {
-  depends_on      = [proxmox_virtual_environment_container.lxc]
-  create_duration = "15s"
 }
